@@ -1,6 +1,6 @@
 <h1 align="center">
   <img src="static/Churn.jpg" alt="Logo" width="80" style="border-radius:50%"><br>
-  Customer Churn Prediction
+  Customer Churn Predictor
 </h1>
 
 <p align="center">
