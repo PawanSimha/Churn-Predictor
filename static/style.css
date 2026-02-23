@@ -307,21 +307,30 @@ button.loading::after {
     text-align: center;
 }
 
-/* ── Table ─────────────────────────────────────────────────── */
+/* ── Table & Responsive Container ──────────────────────────── */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 20px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border);
+    -webkit-overflow-scrolling: touch;
+}
+
 table {
     width: 100%;
+    min-width: 500px;
+    /* Ensures table doesn't collapse too much */
     border-collapse: collapse;
-    margin-top: 20px;
     font-size: 0.9rem;
-    border-radius: 10px;
-    overflow: hidden;
+    background: white;
 }
 
 th,
 td {
     padding: 11px 14px;
     border: 1px solid var(--border);
-    text-align: left;
+    text-align: center;
 }
 
 th {
@@ -470,6 +479,15 @@ tr:hover td {
     th,
     td {
         padding: 8px 10px;
+    }
+
+    .table-container {
+        border-radius: 8px;
+    }
+
+    table {
+        font-size: 0.8rem;
+        min-width: 450px;
     }
 
     .btn-group {

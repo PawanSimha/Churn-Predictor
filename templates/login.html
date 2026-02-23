@@ -101,7 +101,9 @@
 
         <!-- Login form -->
         <form method="POST" action="/login">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div style="display:none;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            </div>
 
             <label for="username">Username</label>
             <input id="username" type="text" name="username" placeholder="Enter your username" autocomplete="username"

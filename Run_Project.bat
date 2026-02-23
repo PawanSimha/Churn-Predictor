@@ -28,10 +28,10 @@ if errorlevel 1 (
     pause & exit /b 1
 )
 
-:: Install Flask if missing
-python -c "import flask" >nul 2>&1
+:: Check dependencies (Flask + ML libraries)
+python -c "import flask, xgboost, lightgbm, catboost, flask_wtf" >nul 2>&1
 if errorlevel 1 (
-    echo [INFO] Installing dependencies...
+    echo [INFO] Missing dependencies detected. Installing/Updating...
     pip install -r "%PROJECT%\requirements.txt"
     echo.
 )

@@ -53,14 +53,19 @@ FEATURE_ORDER = [
 MODEL_PATH = os.path.join(os.path.dirname(__file__), 'churn_prediction_model.pkl')
 model = None
 
+print(f"[*] Attempting to load model from: {MODEL_PATH}")
+
 if os.path.exists(MODEL_PATH):
     try:
         with open(MODEL_PATH, 'rb') as file:
             model = pickle.load(file)
+            print("[+] Model loaded successfully!")
     except Exception as e:
-        print(f"Error loading model: {e}")
+        print(f"[!] CRITICAL: Error loading model: {e}")
+        import traceback
+        traceback.print_exc()
 else:
-    print(f"Warning: Model file not found at {MODEL_PATH}")
+    print(f"[!] CRITICAL: Model file NOT FOUND at {MODEL_PATH}")
 
 # --- Security Decorators ---
 def login_required(f):
