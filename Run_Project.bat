@@ -2,8 +2,9 @@
 title Customer Churn Prediction
 color 0A
 
-:: ── Absolute path to the project root (edit this if you move the folder) ──
-set "PROJECT=c:\Users\pawan\SNPSU\Projects\Customer Churn Prediction"
+:: ── Dynamic path to the project root (no manual editing required) ──
+set "PROJECT=%~dp0"
+set "PROJECT=%PROJECT:~0,-1%"
 
 :: ── Always run from the project root ──
 cd /d "%PROJECT%"

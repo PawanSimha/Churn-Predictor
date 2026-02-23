@@ -1,31 +1,68 @@
 from flask import Flask, render_template, request, redirect, url_for, session
+from flask_wtf.csrf import CSRFProtect
+from werkzeug.security import generate_password_hash, check_password_hash
 import numpy as np
 import pickle
 import os
+import sqlite3
 from functools import wraps
 
-# Create Flask app instance
+# --- Configuration & Initialization ---
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'futuristic_secret_key')  # Secret key to secure sessions
+# Load SECRET_KEY from environment, with a strong fallback only for development
+app.secret_key = os.environ.get('SECRET_KEY', 'dev_key_change_in_production_12345')
+csrf = CSRFProtect(app)
 
-# Dictionary holding multiple users and their passwords for login authentication
-USERS = {
-    "PawanSimha": "simha@123",
-    "Prajwal": "raju@123",
-    "Ankitha": "reddy@123"
-}
+DB_PATH = 'users.db'
 
-# Load pre-trained churn prediction model from pickle file
-model_path = os.path.join(os.path.dirname(__file__), 'churn_prediction_model.pkl')
+def init_db():
+    if not os.path.exists(DB_PATH):
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL
+            )
+        ''')
+        # Seed default users
+        default_users = {
+            "PawanSimha": "simha@123",
+            "Prajwal": "raju@123",
+            "Ankitha": "reddy@123"
+        }
+        for username, password in default_users.items():
+            cursor.execute('INSERT INTO users (username, password_hash) VALUES (?, ?)', 
+                           (username, generate_password_hash(password)))
+        conn.commit()
+        conn.close()
+
+init_db()
+
+# --- Feature Configuration ---
+# Defining feature order once to ensure consistency between training and inference
+FEATURE_ORDER = [
+    'Gender', 'SeniorCitizen', 'Partner', 'Dependents', 'Tenure', 'PhoneService',
+    'MultipleLines', 'InternetService', 'OnlineSecurity', 'OnlineBackup',
+    'DeviceProtection', 'TechSupport', 'StreamingTV', 'StreamingMovies',
+    'Contract', 'PaperlessBilling', 'PaymentMethod', 'MonthlyCharges', 'TotalCharges'
+]
+
+# --- Model Loading ---
+MODEL_PATH = os.path.join(os.path.dirname(__file__), 'churn_prediction_model.pkl')
 model = None
 
-if os.path.exists(model_path):
-    with open(model_path, 'rb') as file:
-        model = pickle.load(file)
+if os.path.exists(MODEL_PATH):
+    try:
+        with open(MODEL_PATH, 'rb') as file:
+            model = pickle.load(file)
+    except Exception as e:
+        print(f"Error loading model: {e}")
 else:
-    print(f"Warning: Model file not found at {model_path}")
+    print(f"Warning: Model file not found at {MODEL_PATH}")
 
-# --- New: Decorator to protect routes that require login ---
+# --- Security Decorators ---
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -33,7 +70,6 @@ def login_required(f):
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
-
 
 # --- Security Headers ---
 @app.after_request
@@ -44,74 +80,80 @@ def add_security_headers(response):
     response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
     return response
 
+# --- Routes ---
 
-# Route for login page (GET request)
 @app.route('/')
 def login():
-    return render_template("login.html")  # Render login form
+    if 'user' in session:
+        return redirect(url_for('index'))
+    return render_template("login.html")
 
-# Route to handle login form submission (POST request)
 @app.route('/login', methods=['POST'])
 def do_login():
-    username = request.form['username']  # Extract username from form
-    password = request.form['password']  # Extract password from form
+    username = request.form.get('username')
+    password = request.form.get('password')
 
-    # Check if username exists and password matches
-    if username in USERS and USERS[username] == password:
-        session['user'] = username  # Store logged in user in session
-        return redirect(url_for('index'))  # Redirect to main index page
-    else:
-        # On invalid credentials, reload login page with error message
-        return render_template('login.html', error="Invalid username or password")
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('SELECT password_hash FROM users WHERE username = ?', (username,))
+    result = cursor.fetchone()
+    conn.close()
 
-# Route for main index page - only accessible if user is logged in
+    if result and check_password_hash(result[0], password):
+        session['user'] = username
+        return redirect(url_for('index'))
+    
+    return render_template('login.html', error="Invalid username or password")
+
 @app.route('/index')
 @login_required
 def index():
-    return render_template("index.html")  # Show main page if user is logged in
+    return render_template("index.html")
 
-# Route to handle churn prediction form submission (POST request)
 @app.route('/predict', methods=['POST'])
 @login_required
 def predict():
     try:
         if not model:
-            return render_template("index.html", prediction_error="Error: Model file not loaded.")
+            return render_template("index.html", prediction_error="System Error: AI Model not available.")
 
-        # Feature order must match the notebook model: X = data.drop(columns=['Churn'])
-        # Form field names (some differ from notebook columns, e.g. Gender vs gender, Tenure vs tenure)
-        feature_order = [
-            'Gender', 'SeniorCitizen', 'Partner', 'Dependents', 'Tenure', 'PhoneService',
-            'MultipleLines', 'InternetService', 'OnlineSecurity', 'OnlineBackup',
-            'DeviceProtection', 'TechSupport', 'StreamingTV', 'StreamingMovies',
-            'Contract', 'PaperlessBilling', 'PaymentMethod', 'MonthlyCharges', 'TotalCharges'
-        ]
-
-        def to_float(val, default=0.0):
+        def sanitize_input(val, default=0.0):
             try:
-                return float(val) if val != '' else default
+                return float(val) if val else default
             except (ValueError, TypeError):
                 return default
 
-        # Gather data in the same order as training data, converting to float
-        final_features = [to_float(request.form.get(f)) for f in feature_order]
-        inputs = list(request.form.items())
-        # Predict churn using the pre-loaded model
-        prediction = model.predict(np.array([final_features]))[0]
-        result = "Churn" if prediction == 1 else "No Churn"
-        # Render result page with inputs and prediction outcome
-        return render_template("result.html", inputs=inputs, prediction=result)
-    except Exception as e:
-        # Handle any error during prediction and show it on the index page
-        return render_template("index.html", prediction_error=f"Prediction Error: {str(e)}")
+        # Process inputs maintainable and securely
+        final_features = [sanitize_input(request.form.get(f)) for f in FEATURE_ORDER]
+        
+        # Inference with Probability for Confidence Score
+        feature_array = np.array([final_features])
+        prediction = model.predict(feature_array)[0]
+        
+        # Get probability if model supports it (VotingClassifier usually does)
+        confidence = 0
+        try:
+            probabilities = model.predict_proba(feature_array)[0]
+            confidence = np.max(probabilities) * 100
+        except:
+            confidence = 100 # Fallback if model doesn't support proba
 
-# --- New logout route to clear user session and redirect to login ---
+        result = "Churn" if prediction == 1 else "No Churn"
+        inputs = list(request.form.items())
+        
+        return render_template("result.html", 
+                               inputs=inputs, 
+                               prediction=result, 
+                               confidence=round(confidence, 2))
+    except Exception as e:
+        return render_template("index.html", prediction_error=f"Prediction Encountered an Issue: {str(e)}")
+
 @app.route('/logout')
 @login_required
 def logout():
-    session.pop('user', None)  # Remove user from session if exists
-    return redirect(url_for('login'))  # Redirect to login page after logout
+    session.clear()
+    return redirect(url_for('login'))
 
-# Run the Flask app in debug mode when script is executed directly
 if __name__ == '__main__':
+    # Production note: In real deployment, use Gunicorn/Nginx and disable debug
     app.run(debug=True)

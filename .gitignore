@@ -53,3 +53,6 @@ test_app.py
 # Distribution / packaging
 *.egg
 *.whl
+
+# Database
+users.db

@@ -47,12 +47,24 @@
         <!-- Colour-coded prediction outcome -->
         {% if prediction == "Churn" %}
         <h2 class="highlight churn">⚠️ Prediction: {{ prediction }}</h2>
-        <p style="text-align:center; color:#888; font-size:0.85rem; margin-bottom:8px;">
+        <div style="text-align:center; margin-bottom:15px;">
+            <span
+                style="background: rgba(231, 76, 60, 0.1); color: var(--danger); padding: 4px 12px; border-radius: 20px; font-weight: 600; font-size: 0.9rem;">
+                Confidence Score: {{ confidence }}%
+            </span>
+        </div>
+        <p style="text-align:center; color:#666; font-size:0.85rem; margin-bottom:8px;">
             This customer is likely to churn. Consider a retention offer.
         </p>
         {% else %}
         <h2 class="highlight no-churn">✅ Prediction: {{ prediction }}</h2>
-        <p style="text-align:center; color:#888; font-size:0.85rem; margin-bottom:8px;">
+        <div style="text-align:center; margin-bottom:15px;">
+            <span
+                style="background: rgba(39, 174, 96, 0.1); color: var(--success); padding: 4px 12px; border-radius: 20px; font-weight: 600; font-size: 0.9rem;">
+                Confidence Score: {{ confidence }}%
+            </span>
+        </div>
+        <p style="text-align:center; color:#666; font-size:0.85rem; margin-bottom:8px;">
             This customer is likely to stay. Keep up the good service!
         </p>
         {% endif %}

@@ -47,6 +47,7 @@
 
         <!-- Multi-step form posting to /predict -->
         <form id="churnForm" method="POST" action="/predict">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
             <!-- ── Step 1: Personal & Account Info ─────────────── -->
             <div class="step active">
