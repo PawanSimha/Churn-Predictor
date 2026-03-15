@@ -21,6 +21,9 @@ March 2025
 **End date**
 May 2025
 
+**License**
+GNU General Public License v3.0
+
 ---
 
 ## Media Upload Info (For Screenshots/Videos)

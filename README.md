@@ -12,6 +12,7 @@
   <img src="https://img.shields.io/badge/Python-3.11%2B-blue?style=for-the-badge&logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/Flask-3.1-green?style=for-the-badge&logo=flask&logoColor=white" alt="Flask">
   <img src="https://img.shields.io/badge/SQLite-3-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite">
+  <img src="https://img.shields.io/badge/License-GPL%20v3-red?style=for-the-badge&logo=gnu&logoColor=white" alt="License: GPL v3">
   <img src="https://img.shields.io/badge/Status-Project-orange?style=for-the-badge" alt="Status">
 </p>
 
@@ -137,15 +138,16 @@ Double-click the **`Run_Project.bat`** file. It will automatically:
 
 ## 📋 Requirements
 ```text
-Flask==3.1.2
+flask==3.1.2
 flask-wtf==1.2.1
+numpy==2.3.5
+pandas==3.0.1
 scikit-learn==1.8.0
 xgboost==3.2.0
 lightgbm==4.6.0
 catboost==1.2.10
-numpy==2.3.5
-pandas==3.0.1
 imbalanced-learn
+seaborn
 cryptography
 ```
 
@@ -159,4 +161,4 @@ cryptography
 ---
 
 ## 📄 License
-This project is open-source and available under the **MIT License**.
+This project is open-source and available under the **GNU General Public License v3.0**.
