@@ -30,7 +30,7 @@
     <div class="container">
         <h1>Customer Churn Predictor</h1>
         <p style="text-align:center; color:#666; font-size:0.85rem; margin-bottom:8px;">
-            Complete all 3 steps to get your prediction
+            Complete all 3 steps to get your prediction…
         </p>
 
         <!-- Step indicator dots -->
@@ -80,11 +80,11 @@
                 </select>
 
                 <label for="Tenure">Tenure (months)</label>
-                <input id="Tenure" type="text" name="Tenure" placeholder="e.g. 24" required>
+                <input id="Tenure" type="number" name="Tenure" placeholder="e.g. 24" required min="0" inputmode="numeric">
 
                 <div class="btn-group">
                     <span></span>
-                    <button type="button" onclick="nextStep()">Next →</button>
+                    <button type="button" onclick="nextStep()">Next Step →</button>
                 </div>
             </div>
 
@@ -141,8 +141,8 @@
                 </select>
 
                 <div class="btn-group">
-                    <button type="button" onclick="prevStep()">← Back</button>
-                    <button type="button" onclick="nextStep()">Next →</button>
+                    <button type="button" onclick="prevStep()">← Previous</button>
+                    <button type="button" onclick="nextStep()">Next Step →</button>
                 </div>
             </div>
 
@@ -186,13 +186,13 @@
                 </select>
 
                 <label for="MonthlyCharges">Monthly Charges ($)</label>
-                <input id="MonthlyCharges" type="text" name="MonthlyCharges" placeholder="e.g. 70.50" required>
+                <input id="MonthlyCharges" type="number" name="MonthlyCharges" step="0.01" placeholder="e.g. 70.50" required inputmode="decimal">
 
                 <label for="TotalCharges">Total Charges ($)</label>
-                <input id="TotalCharges" type="text" name="TotalCharges" placeholder="e.g. 1550.75" required>
+                <input id="TotalCharges" type="number" name="TotalCharges" step="0.01" placeholder="e.g. 1550.75" required inputmode="decimal">
 
                 <div class="btn-group">
-                    <button type="button" onclick="prevStep()">← Back</button>
+                    <button type="button" onclick="prevStep()">← Previous</button>
                     <button type="submit">Predict Outcome 🔍</button>
                 </div>
             </div>
@@ -201,9 +201,9 @@
         <!-- Footer -->
         <div class="footer">
             Developed by
-            <a href="https://github.com/PawanSimha" target="_blank" rel="noopener">Pawan Simha</a>
+            <a href="https://github.com/PawanSimha" target="_blank" rel="noopener" aria-label="Visit Pawan Simha's GitHub profile">Pawan Simha</a>
             &nbsp;|&nbsp;
-            <a href="https://linkedin.com/in/pawansimha" target="_blank" rel="noopener">LinkedIn</a>
+            <a href="https://linkedin.com/in/pawansimha" target="_blank" rel="noopener" aria-label="Visit Pawan Simha's LinkedIn profile">LinkedIn</a>
             &nbsp;|&nbsp;
             <a href="/logout">Logout</a>
         </div>

@@ -53,11 +53,6 @@ html {
 body {
     font-family: 'Poppins', sans-serif;
     background-color: var(--bg-color);
-    background-image: url("../static/Background.jpg");
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: center;
     color: var(--text-color);
     min-height: 100vh;
     display: flex;
@@ -65,6 +60,22 @@ body {
     align-items: center;
     justify-content: flex-start;
     padding: 20px 16px 40px;
+    position: relative;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("../static/Background.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: -1;
+    will-change: transform; /* Performance hint for the compositor */
 }
 
 /* ── Card / Container ──────────────────────────────────────── */
@@ -88,6 +99,7 @@ h1 {
     color: var(--text-color);
     margin-bottom: 6px;
     letter-spacing: -0.5px;
+    text-wrap: balance;
 }
 
 h2 {
@@ -117,6 +129,7 @@ form label {
 
 form input[type="text"],
 form input[type="password"],
+form input[type="number"],
 form select {
     width: 100%;
     padding: 11px 14px;
@@ -134,10 +147,17 @@ form select {
 
 form input[type="text"]:focus,
 form input[type="password"]:focus,
+form input[type="number"]:focus,
 form select:focus {
     border-color: var(--accent);
     box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.18);
     outline: none;
+}
+
+form input:focus-visible,
+form select:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
 }
 
 /* ── Buttons ───────────────────────────────────────────────── */
@@ -159,6 +179,7 @@ button {
     letter-spacing: 0.3px;
     position: relative;
     overflow: hidden;
+    touch-action: manipulation;
 }
 
 button:hover {

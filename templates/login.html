@@ -96,7 +96,7 @@
 
         <h2>Customer Churn Predictor</h2>
         <p style="text-align:center; color:#888; margin-bottom:28px; font-size:0.88rem;">
-            Sign in to access the prediction tool
+            Sign in to access the prediction tool…
         </p>
 
         <!-- Login form -->
@@ -105,9 +105,8 @@
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             </div>
 
-            <label for="username">Username</label>
             <input id="username" type="text" name="username" placeholder="Enter your username" autocomplete="username"
-                required style="margin-top:6px;">
+                required style="margin-top:6px;" spellcheck="false">
 
             <label for="password" style="margin-top:18px;">Password</label>
             <div class="password-wrapper">
